@@ -5,12 +5,18 @@ import VocabList from "./components/VocabList";
 import ExportButton from "./components/ExportButton";
 import exportToCSV from "./utils/Export";
 import { updateRecentItems } from "./utils/Storage";
+import CollapsibleList from "./components/CollapsibleList";
 
 export default function App() {
   // Retrieve vocab list from localStorage when the app loads
   const [vocabList, setVocabList] = useState(() => {
     const savedVocabList = localStorage.getItem('vocabList');
     return savedVocabList ? JSON.parse(savedVocabList) : [];
+  });
+
+  const [namedLists, setNamedLists] = useState(() => {
+    const saved = localStorage.getItem("namedLists");
+    return saved ? JSON.parse(saved) : {};
   });
 
   const [recentWords, setRecentWords] = useState(() => {
@@ -44,6 +50,14 @@ export default function App() {
     setRecentExamples(updateRecentItems(vocab.example, recentExamples, 'recentExamples'));
   };
 
+  const saveAsList = (name, list) => {
+    const updatedNamedLists = { ...namedLists, [name]: list };
+    setNamedLists(updatedNamedLists);
+    setVocabList([]);
+    localStorage.setItem("namedLists", JSON.stringify(updatedNamedLists));
+    localStorage.setItem("vocabList", "[]");
+  };
+
   return (
     <div className="max-w-3xl mx-auto py-6">
       <h1 className="text-2xl font-bold text-center mb-4">Chinese Vocab Tracker</h1>
@@ -57,11 +71,13 @@ export default function App() {
       <DrawingBoard />
       <VocabList
         vocabList={vocabList}
-        saveVocabList={(updatedList) => {
-            setVocabList(updatedList);
-            localStorage.setItem('vocabList', JSON.stringify(updatedList));
-        }}
+        saveAsList={saveAsList}
       />
+      <div className="mt-8">
+        {Object.entries(namedLists).map(([name, list]) => (
+          <CollapsibleList key={name} title={name} vocabList={list} />
+        ))}
+      </div>
       <ExportButton vocabList={vocabList} exportToCSV={exportToCSV} />
     </div>
   );

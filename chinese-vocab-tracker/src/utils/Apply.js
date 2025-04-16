@@ -7,29 +7,34 @@ export const applyToneMarks = (input) => {
         u: ['ū', 'ú', 'ǔ', 'ù'],
         ü: ['ǖ', 'ǘ', 'ǚ', 'ǜ']
     };
-    const vowelPriority = ['a', 'o', 'e', 'i', 'u', 'ü'];
     const processedInput = input.replace(/v/g, 'ü');
 
     return processedInput.replace(/([a-zü]+)([1-4])/gi, (match, syllable, toneNum) => {
         const tone = parseInt(toneNum) - 1;
-        const lowerSyllable = syllable.toLowerCase();
-        let chars = lowerSyllable.split('');
+        const lower = syllable.toLowerCase();
+        let index = -1;
 
-        let indexToReplace = -1;
-        for (const v of vowelPriority) {
-            const idx = chars.indexOf(v);
-            if (idx !== -1) {
-                indexToReplace = idx;
-                break;
+        if (lower.includes('a')) {
+            index = lower.indexOf('a');
+        } else if (lower.includes('e')) {
+            index = lower.indexOf('e');
+        } else if (lower.includes('ou')) {
+            index = lower.indexOf('o');
+        } else {
+            for (let i = syllable.length - 1; i >= 0; i--) {
+                if ('aeiouü'.includes(lower[i])) {
+                    index = i;
+                    break;
+                }
             }
         }
 
-        if (indexToReplace !== -1) {
-            const targetVowel = chars[indexToReplace];
-            if (pinyinTones[targetVowel]) {
-                chars[indexToReplace] = pinyinTones[targetVowel][tone];
-            }
+        if (index !== -1) {
+            const targetVowel = lower[index];
+            const markedVowel = pinyinTones[targetVowel]?.[tone] || targetVowel;
+            return syllable.slice(0, index) + markedVowel + syllable.slice(index + 1);
         }
-        return chars.join('');
+
+        return syllable;
     });
 };

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { applyToneMarks } from "../utils/Apply";
 
-export default function VocabList({ vocabList, saveVocabList }) {
+export default function VocabList({ vocabList, saveVocabList, saveAsList }) {
     const [editedList, setEditedList] = useState(() => JSON.parse(JSON.stringify(vocabList)));
     const [isEditing, setIsEditing] = useState(false);
+    const [newListName, setNewListName] = useState("");
 
     useEffect(() => {
         setEditedList(JSON.parse(JSON.stringify(vocabList)));
@@ -26,6 +27,12 @@ export default function VocabList({ vocabList, saveVocabList }) {
         setIsEditing(false);
     };
 
+    const handleSaveAsList = () => {
+        if (!newListName.trim()) return;
+        saveAsList(newListName, editedList);
+        setNewListName("");
+        setEditedList([]);
+    };
 
     return (
         <div className="border border-gray-400 p-4 rounded-lg shadow-sm relative">
@@ -108,7 +115,7 @@ export default function VocabList({ vocabList, saveVocabList }) {
                 </tbody>
             </table>
             {isEditing ? (
-                <div className="mt-4">
+                <div className="mt-4 flex flex-wrap items-center gap-2">
                     <button
                         onClick={handleSaveClick}
                         className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
@@ -130,6 +137,21 @@ export default function VocabList({ vocabList, saveVocabList }) {
                     Edit List
                 </button>
             )}
+            <div className="mt-4 flex gap-2 items-center">
+                <input
+                type="text"
+                placeholder="Enter list name"
+                value={newListName}
+                onChange={(e) => setNewListName(e.target.value)}
+                className="border px-2 py-1"
+                />
+                <button
+                onClick={handleSaveAsList}
+                className="bg-green-600 text-white px-4 py-1 rounded"
+                >
+                Save as List
+                </button>
+            </div>
         </div>
     );
 }
