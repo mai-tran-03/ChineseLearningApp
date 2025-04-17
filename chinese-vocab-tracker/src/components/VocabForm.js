@@ -1,14 +1,37 @@
-import React, { useState } from "react";
+import React from "react";
 import SuggestionDropdown from "./SuggestionDropdown";
 import useInputDropdown from "../hooks/useInputDropdown";
 import { applyToneMarks } from "../utils/Apply";
 
-export default function VocabForm({ addVocab, recentWords, recentPinyins, recentDefinitions, recentExamples }) {
-    const [word, setWord] = useState('');
-    const [pinyin, setPinyin] = useState('');
-    const [definition, setDefinition] = useState('');
-    const [example, setExample] = useState('');
+function InputWithDropdown({ dropdown, placeholder, applyValue }) {
+    return (
+    <div className="relative">
+        <input
+            type="text"
+            placeholder={placeholder}
+            value={dropdown.value}
+            onChange={(e) => dropdown.setValue(applyValue ? applyValue(e.target.value) : e.target.value)}
+            onFocus={() => dropdown.setShow(true)}
+            onBlur={dropdown.handleBlur}
+            className="w-full px-1 py-1"
+            ref={dropdown.inputRef}
+        />
+        <SuggestionDropdown
+            show={dropdown.show}
+            items={dropdown.items}
+            inputValue={dropdown.value}
+            onSelect={(value) => {
+                dropdown.setValue(value);
+                setTimeout(() => dropdown.setShow(false), 0);
+            }}
+            dropdownRef={dropdown.dropdownRef}
+            width={dropdown.width}
+        />
+    </div>
+    );
+}
 
+export default function VocabForm({ addVocab, recentWords, recentPinyins, recentDefinitions, recentExamples }) {
     const wordDropdown = useInputDropdown(recentWords);
     const pinyinDropdown = useInputDropdown(recentPinyins);
     const definitionDropdown = useInputDropdown(recentDefinitions);
@@ -16,12 +39,17 @@ export default function VocabForm({ addVocab, recentWords, recentPinyins, recent
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const vocab = { word, pinyin, definition, example };
+        const vocab = { 
+            word: wordDropdown.value, 
+            pinyin: pinyinDropdown.value, 
+            definition: definitionDropdown.value, 
+            example: exampleDropdown.value 
+        };
         addVocab(vocab);
-        setWord('');
-        setPinyin('');
-        setDefinition('');
-        setExample('');
+        wordDropdown.setValue('');
+        pinyinDropdown.setValue('');
+        definitionDropdown.setValue('');
+        exampleDropdown.setValue('');
     };
 
     return (
@@ -42,80 +70,28 @@ export default function VocabForm({ addVocab, recentWords, recentPinyins, recent
                     <tbody>
                         <tr>
                             <td className="border border-gray-300 px-2 py-1">
-                                <input
-                                    type="text"
+                                <InputWithDropdown 
+                                    dropdown={wordDropdown}
                                     placeholder="Ex. 一"
-                                    value={word}
-                                    onChange={(e) => setWord(e.target.value)}
-                                    onFocus={() => wordDropdown.setShow(true)}
-                                    onBlur={() => setTimeout(() => wordDropdown.setShow(false), 100)}
-                                    className="w-full px-1 py-1"
-                                    ref={wordDropdown.inputRef}
-                                />
-                                <SuggestionDropdown
-                                    show={wordDropdown.show}
-                                    items={recentWords}
-                                    inputValue={word}
-                                    onSelect={(value) => setWord(value)}
-                                    dropdownRef={wordDropdown.dropdownRef}
-                                    width={wordDropdown.width}
                                 />
                             </td>
                             <td className="border border-gray-300 px-2 py-1">
-                                <input
-                                    type="text"
+                                <InputWithDropdown 
+                                    dropdown={pinyinDropdown}
                                     placeholder="Ex. yi1"
-                                    value={pinyin}
-                                    onChange={(e) => setPinyin(applyToneMarks(e.target.value))}
-                                    onFocus={() => pinyinDropdown.setShow(true)}
-                                    onBlur={() => setTimeout(() => pinyinDropdown.setShow(false), 100)}
-                                    className="w-full px-1 py-1"
-                                />
-                                <SuggestionDropdown
-                                    show={pinyinDropdown.show}
-                                    items={recentPinyins}
-                                    inputValue={pinyin}
-                                    onSelect={(value) => setPinyin(value)}
-                                    dropdownRef={pinyinDropdown.dropdownRef}
-                                    width={pinyinDropdown.width}
+                                    applyValue={applyToneMarks}
                                 />
                             </td>
                             <td className="border border-gray-300 px-2 py-1">
-                                <input
-                                    type="text"
+                                <InputWithDropdown 
+                                    dropdown={definitionDropdown}
                                     placeholder="Ex. one"
-                                    value={definition}
-                                    onChange={(e) => setDefinition(e.target.value)}
-                                    onFocus={() => definitionDropdown.setShow(true)}
-                                    onBlur={() => setTimeout(() => definitionDropdown.setShow(false), 100)}
-                                    className="w-full px-1 py-1"
-                                />
-                                <SuggestionDropdown
-                                    show={definitionDropdown.show}
-                                    items={recentDefinitions}
-                                    inputValue={definition}
-                                    onSelect={(value) => setDefinition(value)}
-                                    dropdownRef={definitionDropdown.dropdownRef}
-                                    width={definitionDropdown.width}
                                 />
                             </td>
                             <td className="border border-gray-300 px-2 py-1">
-                                <input
-                                    type="text"
+                                <InputWithDropdown 
+                                    dropdown={exampleDropdown}
                                     placeholder="Ex. 〇一二三四五六七八九"
-                                    value={example}
-                                    onChange={(e) => setExample(e.target.value)}
-                                    onFocus={() => exampleDropdown.setShow(true)}
-                                    onBlur={() => setTimeout(() => exampleDropdown.setShow(false), 100)}
-                                    className="w-full px-1 py-1"
-                                />
-                                <SuggestionDropdown
-                                    show={exampleDropdown.show}
-                                    items={recentExamples}
-                                    inputValue={example}
-                                    onSelect={(value) => setExample(value)}
-                                    dropdownRef={exampleDropdown.dropdownRef}
-                                    width={exampleDropdown.width}
                                 />
                             </td>
                         </tr>

@@ -6,11 +6,15 @@ export default function SuggestionDropdown({
     dropdownRef,
     width,
 }) {
+    if (!show || items.length === 0) {
+        return null;
+    }
+
     const filtered = items.filter((item) =>
         item.toLowerCase().includes(inputValue.toLowerCase())
     );
 
-    if (!show || filtered.length === 0) {
+    if (filtered.length === 0) {
         return null;
     }
 
@@ -23,7 +27,7 @@ export default function SuggestionDropdown({
             {filtered.map((item, index) => (
                 <li
                     key={index}
-                    onClick={() => onSelect(item)}
+                    onMouseDown={() => onSelect(item)}
                     className="px-2 py-1 hover:bg-gray-700 cursor-pointer"
                 >
                     {item}

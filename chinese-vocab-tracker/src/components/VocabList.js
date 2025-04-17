@@ -28,7 +28,9 @@ export default function VocabList({ vocabList, saveVocabList, saveAsList }) {
     };
 
     const handleSaveAsList = () => {
-        if (!newListName.trim()) return;
+        if (!newListName.trim()) {
+            return;
+        }
         saveAsList(newListName, editedList);
         setNewListName("");
         setEditedList([]);
