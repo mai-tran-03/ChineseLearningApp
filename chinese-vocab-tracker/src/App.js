@@ -19,7 +19,6 @@ export default function App() {
   const addVocab = (vocab) => {
     const updatedList = [...vocabList, vocab];
     setVocabList(updatedList);
-    // localStorage.setItem('vocabList', JSON.stringify(updatedList));
 
     setRecentWords(updateRecentItems(vocab.word, recentWords, 'recentWords'));
     setRecentPinyins(updateRecentItems(vocab.pinyin, recentPinyins, 'recentPinyins'));
